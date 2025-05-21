@@ -77,9 +77,6 @@
 
 - Arbitrary mode for d3–d100 (toggleable, currently disabled)
 - External ADC support (e.g. ADS7830)
-- Roll history recall button
-- Visual indicator for current mode
-- Printable case and PCB files
 
 ---
 
