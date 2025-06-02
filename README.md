@@ -97,7 +97,9 @@ D20DX/
 
 ## 📷 Project Photos / Demo
 
-tktktktk
+[![D20DX Demo Video](https://img.youtube.com/vi/pKyViXFRKMA/0.jpg)](https://youtu.be/pKyViXFRKMA)
+
+Click the thumbnail above to watch the demo video on YouTube.
 
 ---
 
