@@ -101,6 +101,11 @@ D20DX/
 
 Click the thumbnail above to watch the demo video on YouTube.
 
+<div align="center">
+  <img src="images/d20dx1.jpg" alt="D20DX device photo 1" width="45%" style="margin-right: 2%;" />
+  <img src="images/d20dx2.jpg" alt="D20DX device photo 2" width="45%" />
+</div>
+
 ---
 
 ## 📄 License
