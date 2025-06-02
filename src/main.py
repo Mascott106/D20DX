@@ -8,6 +8,8 @@ FLICK_THRESHOLD = 10000
 ROLL_DISPLAY_TIME = 10000
 FLIP_DISPLAY_TIME = 5000
 IDLE_TIMEOUT = 60000
+ADC_SAMPLES = 16  # Increased from 4 to 16 for better averaging
+ADC_HYSTERESIS = 1000  # Dead zone to prevent rapid switching
 
 # --- Volume Control (GP5) ---
 volume_btn = Pin(5, Pin.IN, Pin.PULL_UP)
@@ -102,22 +104,46 @@ last_display_change = time.ticks_ms()
 is_d100_mode = False  # Track if we're in d100 mode
 
 # --- ADC Averaging ---
-def read_average(adc, samples=4):
+def read_average(adc, samples=ADC_SAMPLES):
     return sum(adc.read_u16() for _ in range(samples)) // samples
 
 def get_die_type():
+    global prev_die_type
     val = read_average(pot_type)
     options = [4, 6, 8, 10, 12, 20, 100]
-    index = int((val / 65535) * len(options))
+    
+    # Calculate the raw index
+    raw_index = (val / 65535) * len(options)
+    
+    # Add hysteresis
+    if hasattr(get_die_type, 'last_index'):
+        if abs(raw_index - get_die_type.last_index) < (ADC_HYSTERESIS / 65535) * len(options):
+            raw_index = get_die_type.last_index
+    
+    # Update last index
+    get_die_type.last_index = raw_index
+    
+    # Convert to integer index with bounds checking
+    index = int(raw_index)
     return options[min(index, len(options) - 1)]
 
 def get_dice_count():
-    global is_d100_mode
+    global is_d100_mode, prev_dice_count
     if is_d100_mode:
         return 1
+    
     val = read_average(pot_count)
-    count = int(((65535 - val) / 65535) * 9) + 1
-    return min(count, 9)
+    raw_count = int(((65535 - val) / 65535) * 9) + 1
+    
+    # Add hysteresis
+    if hasattr(get_dice_count, 'last_count'):
+        if abs(raw_count - get_dice_count.last_count) < (ADC_HYSTERESIS / 65535) * 9:
+            raw_count = get_dice_count.last_count
+    
+    # Update last count
+    get_dice_count.last_count = raw_count
+    
+    return min(raw_count, 9)
 
 def cycle_brightness():
     global brightness_index
