@@ -99,6 +99,7 @@ dimmed = False
 display_mode = "select"
 last_activity_time = time.ticks_ms()
 last_display_change = time.ticks_ms()
+is_d100_mode = False  # Track if we're in d100 mode
 
 # --- ADC Averaging ---
 def read_average(adc, samples=4):
@@ -111,6 +112,9 @@ def get_die_type():
     return options[min(index, len(options) - 1)]
 
 def get_dice_count():
+    global is_d100_mode
+    if is_d100_mode:
+        return 1
     val = read_average(pot_count)
     count = int(((65535 - val) / 65535) * 9) + 1
     return min(count, 9)
@@ -220,7 +224,7 @@ def is_flicked():
 def main():
     global last_activity_time, last_display_change, display_mode
     global dimmed, last_brightness_change, last_volume_change
-    global entropy_pool
+    global entropy_pool, is_d100_mode
 
     prev_die_type = get_die_type()
     prev_dice_count = get_dice_count()
@@ -239,6 +243,8 @@ def main():
             cycle_volume()
 
         die_type = get_die_type()
+        # Update d100 mode status
+        is_d100_mode = (die_type == 100)
         dice_count = get_dice_count()
 
         if (die_type != prev_die_type or dice_count != prev_dice_count) and display_mode != "select":
